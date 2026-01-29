@@ -1,0 +1,7 @@
+output/
+logs/
+json_results/
+chatgpt_profile/
+brave_automation_profile/
+backups/
+__pycache__/
