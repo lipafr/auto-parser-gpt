@@ -14,6 +14,7 @@ from validator import Validator
 from backup_manager import BackupManager
 from statistics import Statistics
 from json_handler_v2 import JSONHandlerV2
+from humanization import HumanBehavior, HumanSchedule
 
 def print_header():
     """Печатает заголовок программы"""
@@ -194,8 +195,13 @@ def process_requests_separate_chats(excel_handler, chatgpt_handler, logger, retr
         stats.print_progress(idx, len(pending))
         
         if idx < len(pending):
-            print(f"\n  ⏸️  Пауза {DELAY_BETWEEN_REQUESTS} сек...")
-            time.sleep(DELAY_BETWEEN_REQUESTS)
+            # ✨ HUMANIZATION: Случайная задержка
+            delay = chatgpt_handler.human.get_request_delay()
+            print(f"\n  ⏸️  Пауза {delay:.1f} сек (как человек)...")
+            time.sleep(delay)
+            
+            # ✨ HUMANIZATION: Мини-перерыв если нужно
+            chatgpt_handler.schedule.take_break_if_needed()
     
     stats.end()
     
@@ -466,7 +472,7 @@ def main():
             logger.info("Авторизация выполнена")
         
         driver = browser_manager.get_driver()
-        chatgpt_handler = ChatGPTHandler(driver)
+        chatgpt_handler = ChatGPTHandler(driver, HUMANIZATION_CONFIG)
         
         process_requests(excel_handler, chatgpt_handler, logger, retry_handler, stats)
         
